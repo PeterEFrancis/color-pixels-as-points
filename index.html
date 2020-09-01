@@ -66,7 +66,7 @@ function mandelbrot(p) {
         if (size >= 2) {
           // point is not in the set, so we color based on # of iterations
           const paletteSmoothed = Math.log(Math.log(size) / Math.log(2)) / Math.log(2);
-          const colorI = Math.round(Math.sqrt(i + 1 - paletteSmoothed) * 256);
+          const colorI = Math.round(Math.sqrt(Math.abs(i + 1 - paletteSmoothed)) * 256);
           return ULTRA_FRACTAL_COLORS[colorI % ULTRA_FRACTAL_COLORS.length];
         }
     }

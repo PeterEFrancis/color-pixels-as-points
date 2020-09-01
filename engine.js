@@ -97,7 +97,7 @@ function run() {
         var w = new Worker("worker.js");
         w.postMessage({
           start: i * num_per_each,
-          num_cols: num_per_each + (i == 7 ? output_canvas.width % num_workers : 0), // last one gets a little extra if it is not even
+          num_cols: num_per_each + (i == num_workers - 1 ? output_canvas.width % num_workers : 0), // last one gets a little extra if it is not even
           disc_y: disc_y,
           code: code,
           zoom_x: zoom_x,
