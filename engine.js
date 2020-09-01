@@ -25,6 +25,8 @@ function get_settings() {
   disc_y = Number(document.getElementById('disc-y').value);
   output_canvas.height = disc_y;
 
+  output_canvas.style.maxWidth = disc_x + "px";
+
   zoom_x = disc_x / (x_ub - x_lb);
   zoom_y = disc_y / (y_ub - y_lb);
 

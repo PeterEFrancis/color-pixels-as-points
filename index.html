@@ -8,8 +8,6 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
-  <script src="syntax-highlight.js"></script>
-
   <!-- Mathjax -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML"></script>
 
@@ -28,6 +26,7 @@
     }
     #output {
       width: 100%;
+      max-width: 500px;
       border: 1px solid black;
     }
     p, li {
@@ -120,7 +119,7 @@ function color(p) {
       </div>
     </div>
     <div class="col-md-6">
-      <canvas id="output" width="1000" height="1000"></canvas>
+      <canvas id="output" width="1000" height="1000" class="center-block"></canvas>
       <p id="hover-loc" class="text-center">&nbsp;</p>
     </div>
   </div>
