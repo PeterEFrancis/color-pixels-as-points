@@ -8,20 +8,30 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
+  <script src="syntax-highlight.js"></script>
+
   <!-- Mathjax -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML"></script>
 
 
   <style>
     #functions {
-      height: 800px;
+      height: 600px;
       width: 100%;
       font-family: monospace;
       tab-size: 4;
+      white-space: pre;
+      overflow-wrap: normal;
+      overflow-x: scroll;
+      margin-bottom: 10px;
+      resize: vertical;
     }
     #output {
-      width:100%;
+      width: 100%;
       border: 1px solid black;
+    }
+    p, li {
+      font-size: 14pt;
     }
   </style>
 </head>
@@ -31,34 +41,33 @@
 
 <div class="container-fluid">
   <h1>Color Pixels as Points</h1>
-
-  <div class="row">
+  <iframe src="https://ghbtns.com/github-btn.html?user=peterefrancis&repo=color-pixels-as-points&type=star&count=false&size=large"
+                frameborder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
+  <div class="row" style="margin-top: 40px;">
     <div class="col-md-6">
 <textarea id="functions" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
 function mandelbrot(p) {
-    // Check if in the first bulb
-    const q = (p.re - 1/4)**2 + p.im**2;
-    if (q * ( q + (p.re - 1/4)) <= p.im**2/4) return "black"
-
-    // check for 2nd bulb
-    if ((p.re + 1)**2 + p.im**2 <= 1/16) return "black";
-
-    // really outside
-    if (p.re**2 + p.im**2 >= 4) return "grey";
+    const q = (p.x - 1/4)**2 + p.y**2;
+    if ((q * ( q + (p.x - 1/4)) <= p.y**2/4) || ((p.x + 1)**2 + p.y**2 <= 1/16)) {
+    	// inside first or second bulb
+    	return "black";
+    }
 
     // iterations
-    const x_0 = p.re;
-    const y_0 = p.im;
-    var x = 0;
-    var y = 0;
+    const x_0 = p.x, y_0 = p.y;
+    var x = 0, y = 0;
     var _x, _y;
-    for (var i = 0; i < 10000; i++) {
+    const max_iterations = 10000;
+    for (var i = 0; i < max_iterations; i++) {
         _x = x**2 - y**2 + x_0;
         _y = 2 * x * y + y_0;
-        x = _x;
-        y = _y;
-        if (x**2 + y**2 >= 4) {
-          return ["red", "green", "blue"][i % 3];
+        x = _x, y = _y;
+        const size = Math.sqrt(x**2 + y**2);
+        if (size >= 2) {
+          // point is not in the set, so we color based on # of iterations
+          const paletteSmoothed = Math.log(Math.log(size) / Math.log(2)) / Math.log(2);
+          const colorI = Math.round(Math.sqrt(i + 1 - paletteSmoothed) * 256);
+          return ULTRA_FRACTAL_COLORS[colorI % ULTRA_FRACTAL_COLORS.length];
         }
     }
     return "black";
@@ -71,41 +80,96 @@ function color(p) {
 }
 
 
+
 </textarea>
-      <button class="btn btn-default btn-block btn-lg" onclick="run()">run</button>
-      <p id="error" style="color: red"></p>
+<p id="error" style="color: red; margin-bottom: 30px">&nbsp;</p>
+
+      <div class="row" style="margin-bottom: 20px;">
+        <div class="col-sm-6">
+          <div class="input-group">
+            <input id="x-lb" type="number" class="form-control" value="-2"/>
+            <span class="input-group-addon">\(\leq x\leq\)</span>
+            <input id="x-ub" type="number" class="form-control" value="2"/>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="input-group">
+            <input id="y-lb" type="number" class="form-control" value="-2"/>
+            <span class="input-group-addon">\(\leq y\leq\)</span>
+            <input id="y-ub" type="number" class="form-control" value="2"/>
+          </div>
+        </div>
+      </div>
+      <div class="input-group" style="margin-bottom: 20px">
+        <span class="input-group-addon">Discretize with</span>
+        <input id="disc-x" type="number" class="form-control" value="500"/>
+        <span class="input-group-addon" style="user-select:none;">\(\times\)</span>
+        <input id="disc-y" type="number" class="form-control" value="500"/>
+        <span class="input-group-addon">pixels</span>
+      </div>
+      <div class="row" style="margin-bottom: 40px">
+        <div class="col-sm-6" style="margin-bottom: 20px">
+          <div class="input-group">
+            <span class="input-group-addon">Number of Workers</span>
+            <input id="num-workers" type="number" class="form-control" value="8"></input>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <button class="btn btn-primary btn-block" onclick="run()">run</button>
+        </div>
+      </div>
     </div>
     <div class="col-md-6">
       <canvas id="output" width="1000" height="1000"></canvas>
       <p id="hover-loc" class="text-center">&nbsp;</p>
-      <div class="row" style="margin-bottom: 40px;">
-        <div class="col-sm-6">
-          <div class="input-group">
-            <input id="re-lb" type="number" class="form-control" value="-2"/>
-            <span class="input-group-addon">\(\leq \text{Re}(z)\leq\)</span>
-            <input id="re-ub" type="number" class="form-control" value="2"/>
-          </div>
-        </div>
-        <div class="col-sm-6">
-          <div class="input-group">
-            <input id="im-lb" type="number" class="form-control" value="-2"/>
-            <span class="input-group-addon">\(\leq \text{Im}(z)\leq\)</span>
-            <input id="im-ub" type="number" class="form-control" value="2"/>
-          </div>
-        </div>
-      </div>
-      <div class="input-group" style="margin-bottom: 40px">
-        <span class="input-group-addon">Discretize with</span>
-        <input id="disc-re" type="number" class="form-control" value="500"/>
-        <span class="input-group-addon" style="user-select:none;">\(\times\)</span>
-        <input id="disc-im" type="number" class="form-control" value="500"/>
-        <span class="input-group-addon">pixels</span>
-      </div>
     </div>
   </div>
+  <hr style="margin: 50px 0px 80px 0px">
+  <div class="row" style="margin-bottom: 100px;">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <h3 class="text-center">About</h3>
+      <p>This tool is an interface for some javascript that colors pixels on an HTML canvas element.
+         In order to use it, you should be somewhat familiar with <a href="https://www.w3schools.com/js/default.asp">the javascript language</a>.</p>
+      <h4>Structural flow</h4>
+      <p>On the left, there is a code window, where you can write any javascript you want, and underneath, there are various display settings. When the "run" button is clicked, the following happens:</p>
+      <ul>
+        <li>the javascript code that is written in the code window is evaluated completely</li>
+        <li>display settings are saved</li>
+        <li><u>If your browser allows web workers:</u></li>
+        <ul>
+          <li>The number of workers specified will be created and be given different ranges of the output image to compute asynchonously.</li>
+          <li>Each web worker is given a starting location (pixel column), the number of columns to compute, your inputed code string, and other necessay display settings.</li>
+          <li>Each worker then re-evaluates the code string, and iterate over the "stripe" of the image that it was assigned, building a two dimmensional array of colors using the function <code>color(p)</code> specified in the code window.</li>
+          <li>When the computation is finished, the color data array is sent back, and the colors are placed on the output canvas.</li>
+        </ul>
+        <li><u>If your browser doesn' support web workers,</u> the computation described above is done on this page, all at once, and colors are not stores in arrays before being put on the canvas.</li>
+      </ul>
+      <h4>Use</h4>
+      <p>Any javascript can be entered in the code window, but it is important that the function <code>color(p)</code> is defined, where the argument <code>p</code> (a point) is a javascript object with fields <code>x</code> and <code>y</code>, and the return value is a valid <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value">color string</a>. For example, if we wanted to color all of the points with x coordinate greater than 1 <code>"black"</code>, and the rest <code>"red"</code>, one way to define <code>color(p)</code> is as follows.</p>
+<pre>
+function color(p) {
+  if (p.x > 1) {
+    return "black";
+  }
+  return "rgb(255, 0, 0)";
+}
+</pre>
+      <h4>The Mandelbrot Example</h4>
+      <p>Since complex numbers are not native in javascript, it is simplest to do all calculations as though we consider complex numbers ordered pairs of real numbers with spoecial operations defined on them. The function <code>mandelbrot(p)</code> is a coloring function that gets called from <code>color(p)</code> simply to allow for changing <code>color(p)</code> without deleting <code>mandelbrot(p)</code>.</p>
+      <p>The algorithm for coloring the Mandelbrot set on the plane is better described elsewhere, but the main idea is to test each complex number \(c\) to see if the limit of infinite seuence generated by iteration of the function \(f_c:\mathbb{C}\to\mathbb{C}\) given by \(f_c(z)=z^2+c\), with the initial point \(z=0\), is \(0\) (in which case \(c\) is in the set) or grows without bound (in which case \(c\) is not in the set).</p>
+      <p>To speed up computation, the function <code>mandelbrot(p)</code> first tests if <code>p</code> is inside either the first or second bulb of the Mandelbrot set directly. If it is, <code>mandelbrot(p)</code> returns <code>"black"</code>, and if it is not, it continues to iterate the function described earlier.</p>
+      <p>There are many beautiful ways to color the Mandelbrot set: the sceheme used here colors all of the points that are approximated to be in the set black, while the other points are colored corresponding to how long (how many iterations, \(i\)) it took before the modulus of \(f^i_c(0)\) is greater than 2 (in which case it is certain that \(c\) is not in the Mandelbrot set). The colors used are cycled through, and are given in the array <code>ULTRA_FRACTAL_COLORS</code>, which is available for your use as well.</p>
+    </div>
+    <div class="col-md-3"></div>
+  </div>
+  <div class="row" style="margin:100px 0px 50px 0px;">
+  <div class="col-md-12">
+    <p class="text-center" style="color: grey">Copyright &copy; 2020 <a style="color:grey; text-decoration: underline;" href="https:PeterEFrancis.com">Peter E. Francis</a></p>
+  </div>
+</div>
 </div>
 <script src="engine.js"></script>
-<script src="complex_functions.js"></script>
 <script>
   var textareas = document.getElementsByTagName('textarea');
   var count = textareas.length;
