@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Test Points as Pixels</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+  <!-- Mathjax -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML"></script>
+
+
+  <style>
+    #functions {
+      height: 800px;
+      width: 100%;
+      font-family: monospace;
+      tab-size: 4;
+    }
+    #output {
+      width:100%;
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+
+
+
+<div class="container-fluid">
+  <h1>Test Points as Pixels</h1>
+
+  <div class="row">
+    <div class="col-md-6">
+<textarea id="functions" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+function mandelbrot(p) {
+    // Check if in the first bulb
+    const q = (p.re - 1/4)**2 + p.im**2;
+    if (q * ( q + (p.re - 1/4)) <= p.im**2/4) return "black"
+
+    // check for 2nd bulb
+    if ((p.re + 1)**2 + p.im**2 <= 1/16) return "black";
+
+    // really outside
+    if (p.re**2 + p.im**2 >= 4) return "grey";
+
+    // iterations
+    const x_0 = p.re;
+    const y_0 = p.im;
+    var x = p.re;
+    var y = p.im;
+    var _x, _y;
+    for (var i = 0; i < 10000; i++) {
+        _x = x**2 - y**2 + x_0;
+        _y = 2 * x * y + y_0;
+        x = _x;
+        y = _y;
+        if (x**2 + y**2 >= 4) {
+          return ["red", "green", "blue"][(i+1) % 3];
+        }
+    }
+    return "black";
+}
+
+
+// the 'color' function must be here
+function color(p) {
+    return mandelbrot(p);
+}
+
+
+</textarea>
+      <button class="btn btn-default btn-block btn-lg" onclick="run()">run</button>
+      <p id="error" style="color: red"></p>
+    </div>
+    <div class="col-md-6">
+      <canvas id="output" width="1000" height="1000"></canvas>
+      <p id="hover-loc" class="text-center">&nbsp;</p>
+      <div class="row" style="margin-bottom: 40px;">
+        <div class="col-sm-6">
+          <div class="input-group">
+            <input id="re-lb" type="number" class="form-control" value="-2"/>
+            <span class="input-group-addon">\(\leq \text{Re}(z)\leq\)</span>
+            <input id="re-ub" type="number" class="form-control" value="2"/>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="input-group">
+            <input id="im-lb" type="number" class="form-control" value="-2"/>
+            <span class="input-group-addon">\(\leq \text{Im}(z)\leq\)</span>
+            <input id="im-ub" type="number" class="form-control" value="2"/>
+          </div>
+        </div>
+      </div>
+      <div class="input-group" style="margin-bottom: 40px">
+        <span class="input-group-addon">Discretize with</span>
+        <input id="disc-re" type="number" class="form-control" value="500"/>
+        <span class="input-group-addon" style="user-select:none;">\(\times\)</span>
+        <input id="disc-im" type="number" class="form-control" value="500"/>
+        <span class="input-group-addon">pixels</span>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="engine.js"></script>
+<script>
+  var textareas = document.getElementsByTagName('textarea');
+  var count = textareas.length;
+  for(var i=0;i<count;i++){
+      textareas[i].onkeydown = function(e){
+          if(e.keyCode==9 || e.which==9){
+              e.preventDefault();
+              var s = this.selectionStart;
+              this.value = this.value.substring(0,this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
+              this.selectionEnd = s+1;
+          }
+      }
+  }
+</script>
+</body>
+</html>
