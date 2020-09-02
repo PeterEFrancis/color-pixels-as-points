@@ -43,7 +43,7 @@ function get_output_canvas_point(p) {
             y: (y_ub - p.y) * zoom_y};
 }
 
-function get_C_point(p) {
+function get_real_point(p) {
   // given the output_canvas coordinate point, get a point in C
   return {x: p.x / zoom_x + x_lb,
           y: y_ub - p.y / zoom_y};
@@ -69,13 +69,37 @@ output_canvas.addEventListener('mousemove', function(e) {
       var rect = output_canvas.getBoundingClientRect();
       var user_x = (e.clientX - rect.left) * (output_canvas.width / output_canvas.clientWidth);
       var user_y = (e.clientY - rect.top) * (output_canvas.height / output_canvas.clientHeight);
-      var p = get_C_point({x:user_x, y:user_y});
+      var p = get_real_point({x:user_x, y:user_y});
       document.getElementById('hover-loc').innerHTML = toString(round(p, depth_x, depth_y));
     }
   } catch(e) {
     // if no image is loaded, this wont work, so this is ok
   }
 });
+
+output_canvas.addEventListener('dblclick', function(e) {
+  console.log("here");
+  // center and zoom by 2x
+  var rect = output_canvas.getBoundingClientRect();
+  var user_x = (e.clientX - rect.left) * (output_canvas.width / output_canvas.clientWidth);
+  var user_y = (e.clientY - rect.top) * (output_canvas.height / output_canvas.clientHeight);
+
+  const real_point = get_real_point({x:user_x, y:user_y});
+
+  document.getElementById('x-lb').value = real_point.x - (output_canvas.width / 2) / (zoom_x * 2);
+  document.getElementById('x-ub').value = real_point.x + (output_canvas.width / 2) / (zoom_x * 2);
+  document.getElementById('y-lb').value = real_point.y - (output_canvas.height / 2) / (zoom_y * 2);
+  document.getElementById('y-ub').value = real_point.y + (output_canvas.height / 2) / (zoom_y * 2);
+
+  run();
+
+});
+// output_canvas.addEventListener('contextmenu', function(e) {
+//   e.preventDefault();
+//   cart.zoom_to(cart.zoom / 2);
+// });
+
+
 
 
 function run() {
@@ -119,7 +143,7 @@ function run() {
     } else {
       for (var i = 0; i < disc_x; i++) {
         for (var j = 0; j < disc_y; j++) {
-          output_ctx.fillStyle = color(get_C_point({x:i,y:j}));
+          output_ctx.fillStyle = color(get_real_point({x:i,y:j}));
           output_ctx.fillRect(i, j, 1, 1);
         }
       }
