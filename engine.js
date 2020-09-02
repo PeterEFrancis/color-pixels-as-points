@@ -62,7 +62,6 @@ function toString(p) {
 output_canvas.addEventListener('mouseout', function() {
   document.getElementById('hover-loc').innerHTML = "&nbsp;";
 });
-
 output_canvas.addEventListener('mousemove', function(e) {
   try {
     if (depth_x) {
@@ -76,9 +75,7 @@ output_canvas.addEventListener('mousemove', function(e) {
     // if no image is loaded, this wont work, so this is ok
   }
 });
-
 output_canvas.addEventListener('dblclick', function(e) {
-  console.log("here");
   // center and zoom by 2x
   var rect = output_canvas.getBoundingClientRect();
   var user_x = (e.clientX - rect.left) * (output_canvas.width / output_canvas.clientWidth);
@@ -94,10 +91,22 @@ output_canvas.addEventListener('dblclick', function(e) {
   run();
 
 });
-// output_canvas.addEventListener('contextmenu', function(e) {
-//   e.preventDefault();
-//   cart.zoom_to(cart.zoom / 2);
-// });
+output_canvas.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+  // center and zoom by 1/2
+  var rect = output_canvas.getBoundingClientRect();
+  var user_x = (e.clientX - rect.left) * (output_canvas.width / output_canvas.clientWidth);
+  var user_y = (e.clientY - rect.top) * (output_canvas.height / output_canvas.clientHeight);
+
+  const real_point = get_real_point({x:user_x, y:user_y});
+
+  document.getElementById('x-lb').value = real_point.x - (output_canvas.width / 2) / (zoom_x / 2);
+  document.getElementById('x-ub').value = real_point.x + (output_canvas.width / 2) / (zoom_x / 2);
+  document.getElementById('y-lb').value = real_point.y - (output_canvas.height / 2) / (zoom_y / 2);
+  document.getElementById('y-ub').value = real_point.y + (output_canvas.height / 2) / (zoom_y / 2);
+
+  run();
+});
 
 
 
