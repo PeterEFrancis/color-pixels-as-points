@@ -82,6 +82,8 @@ output_canvas.addEventListener('dblclick', function(e) {
   var user_x = (e.clientX - rect.left) * (output_canvas.width / output_canvas.clientWidth);
   var user_y = (e.clientY - rect.top) * (output_canvas.height / output_canvas.clientHeight);
 
+  get_settings();
+
   const real_point = get_real_point({x:user_x, y:user_y});
 
   document.getElementById('x-lb').value = real_point.x - (output_canvas.width / 2) / (zoom_x * 2);
@@ -98,6 +100,8 @@ output_canvas.addEventListener('contextmenu', function(e) {
   var rect = output_canvas.getBoundingClientRect();
   var user_x = (e.clientX - rect.left) * (output_canvas.width / output_canvas.clientWidth);
   var user_y = (e.clientY - rect.top) * (output_canvas.height / output_canvas.clientHeight);
+
+  get_settings();
 
   const real_point = get_real_point({x:user_x, y:user_y});
 
@@ -164,4 +168,13 @@ function run() {
     document.getElementById('error').innerHTML = e;
   }
 
+}
+
+
+function download_output() {
+  var link = document.createElement('a');
+  link.download = 'color-pixels-as-points.png';
+  link.href = output_canvas.toDataURL();
+  link.click();
+  // window.location.href = output_canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
 }
