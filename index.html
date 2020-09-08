@@ -143,7 +143,7 @@ function color(p) {
 <script src="engine.js"></script>
 
 <script>
-const mand_example = 'function mandelbrot(p) {\n\tconst q = (p.x - 1/4)**2 + p.y**2;\n\tif ((q * ( q + (p.x - 1/4)) <= p.y**2/4) || ((p.x + 1)**2 + p.y**2 <= 1/16)) {\n\t\t// inside first or second bulb\n\t\treturn "black";\n\t}\n\n\t// iterations\n\tconst x_0 = p.x, y_0 = p.y;\n\tvar x = 0, y = 0;\n\tvar _x, _y;\n\tconst max_iterations = 10000;\n\tfor (var i = 0; i < max_iterations; i++) {\n\t\t_x = x**2 - y**2 + x_0;\n\t\t_y = 2 * x * y + y_0;\n\t\tx = _x, y = _y;\n\t\tconst size = Math.sqrt(x**2 + y**2);\n\t\tif (size >= 2) {\n\t\t\t// point is not in the set, so we color based on # of iterations\n\t\t\tconst paletteSmoothed = Math.log(Math.log(size) / Math.log(2)) / Math.log(2);\n\t\t\tconst colorI = Math.round(Math.sqrt(Math.abs(i + 1 - paletteSmoothed)) * 256);\n\t\t\treturn ULTRA_FRACTAL_COLORS[colorI % ULTRA_FRACTAL_COLORS.length];\n\t\t}\n\t}\n\treturn "black";\n}\n\n\n// the "color" function must be here\nfunction color(p) {\n\treturn mandelbrot(p);\n}\n\n';
+const mand_example = 'function mandelbrot(p) {\n\tconst q = (p.x - 1/4)**2 + p.y**2;\n\tif ((q * ( q + (p.x - 1/4)) <= p.y**2/4) || ((p.x + 1)**2 + p.y**2 <= 1/16)) {\n\t\t// inside first or second bulb\n\t\treturn "black";\n\t}\n\n\t// iterations\n\tconst x_0 = p.x, y_0 = p.y;\n\tvar x = 0, y = 0;\n\tvar _x, _y;\n\tconst max_iterations = 10000;\n\tfor (var i = 0; i < max_iterations; i++) {\n\t\t_x = x**2 - y**2 + x_0;\n\t\t_y = 2 * x * y + y_0;\n\t\tx = _x, y = _y;\n\t\tconst size = Math.sqrt(x**2 + y**2);\n\t\tif (size > 2) {\n\t\t\t// point is not in the set, so we color based on # of iterations\n\t\t\tconst paletteSmoothed = Math.log(Math.log(size) / Math.log(2)) / Math.log(2);\n\t\t\tconst colorI = Math.round(Math.sqrt(Math.abs(i + 1 - paletteSmoothed)) * 256);\n\t\t\treturn ULTRA_FRACTAL_COLORS[colorI % ULTRA_FRACTAL_COLORS.length];\n\t\t}\n\t}\n\treturn "black";\n}\n\n\n// the "color" function must be here\nfunction color(p) {\n\treturn mandelbrot(p);\n}\n\n';
 
 /** this is what that string is:
 
@@ -164,7 +164,7 @@ function mandelbrot(p) {
         _y = 2 * x * y + y_0;
         x = _x, y = _y;
         const size = Math.sqrt(x**2 + y**2);
-        if (size >= 2) {
+        if (size > 2) {
           // point is not in the set, so we color based on # of iterations
           const paletteSmoothed = Math.log(Math.log(size) / Math.log(2)) / Math.log(2);
           const colorI = Math.round(Math.sqrt(Math.abs(i + 1 - paletteSmoothed)) * 256);
