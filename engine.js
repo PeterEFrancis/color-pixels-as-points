@@ -76,6 +76,7 @@ output_canvas.addEventListener('mousemove', function(e) {
   }
 });
 output_canvas.addEventListener('dblclick', function(e) {
+
   // center and zoom by 2x
   var rect = output_canvas.getBoundingClientRect();
   var user_x = (e.clientX - rect.left) * (output_canvas.width / output_canvas.clientWidth);
@@ -117,7 +118,7 @@ function run() {
 
   try {
     // eval javascript
-    const code = document.getElementById('functions').value;
+    const code = myCodeMirror.getValue();
     eval(code);
     if (typeof(color) == "undefined") {
       throw "Missing Error: the function color() must be defined";
